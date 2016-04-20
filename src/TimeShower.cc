@@ -206,13 +206,18 @@ void TimeShower::init( BeamParticle* beamAPtrIn,
   doHVshower         = settingsPtr->flag("HiddenValley:FSR");
   nCHV               = settingsPtr->mode("HiddenValley:Ngauge");
   alphaHVfix         = settingsPtr->parm("HiddenValley:alphaFSR");
+  alphaHVrun         = settingsPtr->flag("HiddenValley:alphaHVrun");
+  double LambdaHV    = settingsPtr->parm("HiddenValley:LambdaHV");
+  nFlHV              = settingsPtr->parm("HiddenValley:nfl");  
   pThvCut            = settingsPtr->parm("HiddenValley:pTminFSR");
   pT2hvCut           = pThvCut * pThvCut;
   CFHV               = (nCHV == 1) ? 1. : (nCHV * nCHV - 1.)/(2. * nCHV);
   idHV               = (nCHV == 1) ? 4900022 : 4900021;
   mHV                = particleDataPtr->m0(idHV);
   brokenHVsym        = (nCHV == 1 && mHV > 0.);
-
+  LambdaHV2          = LambdaHV*LambdaHV;
+  alphaHVorder       = ( CFHV>1 && alphaHVrun ) ? 1 : 0;
+  
   // Possibility of two predetermined hard emissions in event.
   doSecondHard    = settingsPtr->flag("SecondHard:generate");
 
@@ -241,58 +246,6 @@ void TimeShower::init( BeamParticle* beamAPtrIn,
   splittingNameSel   = "";
   splittingNameNow   = "";
   enhanceFactors.clear();
-
-  /*
-  // Populate lists of uncertainty variations related to TimeShower, by keyword
-  iUVarQCD.resize(0);
-  iUVarQED.resize(0);
-  uVarMuSoftCorr = settingsPtr->flag("Uncertainties:muSoftCorr");
-  cout<<"Total number of uncertainty bands : "<<settingsPtr->nUVar()<<endl;
-  for (int iWeight=1; iWeight<settingsPtr->nUVar(); ++iWeight) {
-    UVar* uVarPtr = settingsPtr->getUVarPtr(iWeight);
-    if (uVarPtr == 0) continue;
-    // 1) Define and resolve any allowed shorthand notations
-    if (uVarPtr->hasVar("fsr:muR")) {
-      double parm = uVarPtr->getVar("fsr:muR");
-      uVarPtr->addVar("fsr:G2GG:muR",parm);
-      uVarPtr->addVar("fsr:Q2QG:muR",parm);
-      uVarPtr->addVar("fsr:G2QQ:muR",parm);
-    }
-    if (uVarPtr->hasVar("fsr:cNS")) {
-      double parm = uVarPtr->getVar("fsr:cNS");
-      uVarPtr->addVar("fsr:G2GG:cNS",parm);
-      uVarPtr->addVar("fsr:Q2QG:cNS",parm);
-      uVarPtr->addVar("fsr:G2QQ:cNS",parm);
-    }
-    if (uVarPtr->hasVar("fsr:muRqed")) {
-      double parm = uVarPtr->getVar("fsr:muRqed");
-      uVarPtr->addVar("fsr:X2XA:muRqed",parm);
-      uVarPtr->addVar("fsr:A2LL:muRqed",parm);
-      uVarPtr->addVar("fsr:A2QQ:muRqed",parm);
-    }
-    if (uVarPtr->hasVar("fsr:cNSqed")) {
-      double parm = uVarPtr->getVar("fsr:cNSqed");
-      uVarPtr->addVar("fsr:X2XA:cNSqed",parm);
-      uVarPtr->addVar("fsr:A2LL:cNSqed",parm);
-      uVarPtr->addVar("fsr:A2QQ:cNSqed",parm);
-    }
-    // 2.1) Populate list of QCD variations
-    if (uVarPtr->hasVar("fsr:G2GG:muR") || uVarPtr->hasVar("fsr:Q2QG:muR")
-        || uVarPtr->hasVar("fsr:G2QQ:muR") || uVarPtr->hasVar("fsr:G2GG:cNS")
-        || uVarPtr->hasVar("fsr:Q2QG:cNS") || uVarPtr->hasVar("fsr:G2QQ:cNS")
-        || uVarPtr->hasVar("fsr:G2QQ:weight"))
-      iUVarQCD.push_back(iWeight);
-    // 2.2) Populate list of QED variations
-    if (uVarPtr->hasVar("fsr:X2XA:muR") || uVarPtr->hasVar("fsr:A2LL:muR")
-        || uVarPtr->hasVar("fsr:A2QQ:muR") || uVarPtr->hasVar("fsr:X2XA:cNS")
-        || uVarPtr->hasVar("fsr:A2LL:nCNS") || uVarPtr->hasVar("fsr:A2QQ:nCNS")
-        || uVarPtr->hasVar("fsr:A2LL:weight")
-        || uVarPtr->hasVar("fsr:A2QQ:weight"))
-      iUVarQED.push_back(iWeight);
-
-  // End loop over uncertainty variations
-  }
-  */
 
 }
 
@@ -2795,6 +2748,8 @@ void TimeShower::pT2nextHV(double pT2begDip, double pT2sel,
   double colvFac     = (colvTypeAbs == 1) ? CFHV : 0.5 * nCHV;
   double alphaHV2pi  = colvFac * (alphaHVfix / (2. * M_PI));
 
+  double b0HV = (11./6.*nCHV - 2./6.*nFlHV);
+  
   // Determine overestimated z range. Find evolution coefficient.
   double zMinAbs = 0.5 - sqrtpos( 0.25 - pT2endDip / dip.m2DipCorr );
   if (zMinAbs < SIMPLIFYROOT) zMinAbs = pT2endDip / dip.m2DipCorr;
@@ -2821,8 +2776,17 @@ void TimeShower::pT2nextHV(double pT2begDip, double pT2sel,
     enhanceNow = 1.;
     nameNow = "";
 
-    // Pick pT2 (in overestimated z range).
-    dip.pT2 = dip.pT2 * pow(rndmPtr->flat(), 1. / emitCoefTot);
+    // Pick pT2 (in overestimated z range) for fixed alpha_strong.
+    if (alphaHVorder == 0) {
+      dip.pT2 = dip.pT2 * pow( rndmPtr->flat(),
+        1. / (alphaHV2pi * emitCoefTot) );
+
+    // Ditto for first-order alpha_strong.
+    } else {
+      dip.pT2 = LambdaHV2 * pow( dip.pT2 / LambdaHV2,
+        pow( rndmPtr->flat(), b0HV / emitCoefTot) );
+    }
+      
     wt = 0.;
 
     // Abort evolution if below cutoff scale, or below another branching.

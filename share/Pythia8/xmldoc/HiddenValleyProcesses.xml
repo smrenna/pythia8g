@@ -385,7 +385,22 @@ multiplied by <ei>C_F = (N^2 - 1) / (2 * N)</ei> for an
 <parm name="HiddenValley:pTminFSR" default="0.4" min="0.1"> 
 lowest allowed <ei>pT</ei> of emission. Chosen with same default 
 as in normal QCD showers. 
-</parm> 
+</parm>
+
+Additional parameters by Pedro:
+<parm name="HiddenValley:nfl" default ="1.0" min="0.0">
+    Number of qv flavours for running of alphaHV. It is
+    convenient for this to be independent of nFlav.
+</parm>
+<flag name="HiddenValley:alphaHVrun" default="off">
+    allow running of alphaHV.
+</flag>
+<parm name="HiddenValley:LambdaHV" default="0.1">
+    Hidden Valley "QCD" scale. Note that pTminFSR must be larger than
+    this scale, otherwise the shower will fail.
+</parm>
+
+
  
 <h3>Hadronization</h3> 
  

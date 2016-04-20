@@ -238,21 +238,21 @@ private:
          doQEDshowerByGamma, doWeakShower, doMEcorrections, doMEextended,
          doMEafterFirst, doPhiPolAsym, doPhiPolAsymHard, doInterleave,
          allowBeamRecoil, dampenBeamRecoil, recoilToColoured, useFixedFacScale,
-         allowRescatter, canVetoEmission, doHVshower, brokenHVsym,
+         allowRescatter, canVetoEmission, doHVshower, brokenHVsym, alphaHVrun,
          globalRecoil, useLocalRecoilNow, doSecondHard, hasUserHooks,
          singleWeakEmission, alphaSuseCMW, vetoWeakJets, allowMPIdipole,
          weakExternal, recoilDeadCone, uVarMuSoftCorr;
   int    pTmaxMatch, pTdampMatch, alphaSorder, alphaSnfmax, nGluonToQuark,
          weightGluonToQuark, alphaEMorder, nGammaToQuark, nGammaToLepton,
-         nCHV, idHV, nMaxGlobalRecoil, weakMode;
+         nCHV, idHV, alphaHVorder, nMaxGlobalRecoil, weakMode;
   double pTdampFudge, mc, mb, m2c, m2b, renormMultFac, factorMultFac,
          fixedFacScale2, alphaSvalue, alphaS2pi, Lambda3flav, Lambda4flav,
          Lambda5flav, Lambda3flav2, Lambda4flav2, Lambda5flav2,
          scaleGluonToQuark, extraGluonToQuark, pTcolCutMin, pTcolCut,
          pT2colCut, pTchgQCut, pT2chgQCut, pTchgLCut, pT2chgLCut,
          pTweakCut, pT2weakCut, mMaxGamma, m2MaxGamma, octetOniumFraction,
-         octetOniumColFac, mZ, gammaZ, thetaWRat, mW, gammaW, CFHV,
-         alphaHVfix, pThvCut, pT2hvCut, mHV, pTmaxFudgeMPI,
+         octetOniumColFac, mZ, gammaZ, thetaWRat, mW, gammaW, CFHV, nFlHV,
+         alphaHVfix, pThvCut, pT2hvCut, mHV, LambdaHV2, pTmaxFudgeMPI,
          weakEnhancement, vetoWeakDeltaR2;
 
   // alphaStrong and alphaEM calculations.
