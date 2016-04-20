@@ -7,13 +7,15 @@ to study how event properties change when some of the parameters
 (such as those describing the parton showers) are 
 varied.   Pythia8 now has the ability to provide a series of weights 
 to reflect the change in probability for a particular final state to occur when 
-a subset of parton shower parameters are varied.   Currently, the list of 
-available variations are for: 
+a subset of parton shower parameters are varied.  Details on the
+implementation and interpretation of these weights can be found in
+<ref>Mre16</ref>.
+Currently, the list of available variations are for: 
 <ol> 
 <li> the renormalization scale for QCD emissions in FSR; </li> 
 <li> the renormalization scale for QCD emissions in ISR; </li> 
-<li> the inclusion of finite pieces in QCD emissions in FSR; </li> 
-<li> the inclusion of finite pieces in QCD emissions in ISR. </li> 
+<li> the inclusion of non-singular terms in QCD emissions in FSR; </li> 
+<li> the inclusion of non-singular terms in QCD emissions in ISR. </li> 
 </ol> 
 Similar variations are possible for QED emissions, but these are not 
 yet implemented. 
@@ -22,7 +24,10 @@ yet implemented.
 The variations are steered by a settings string with the format: 
  
 <p>"user-provided-name-for-this-variation  variation-parameter value ... variation-parameter value"</p> 
- 
+
+<wvec name="UncertaintyVariations" default="">
+</wvec>
+
 Examples are: 
  
 <ul> 
@@ -41,9 +46,11 @@ where <ei> i </ei> represents the <ei>i</ei>'th variation.
  
 Additionally, there is a run-time parameter: 
  
-<flag name="Uncertainties:muSoftCorr" default="off"> 
-This flags tells the shower to apply a soft correction to 
-gluon emission. 
+<flag name="UncertaintyVariations:muSoftCorr" default="on"> 
+This flags tells the shower to apply an O(&alpha;S<sup>2</sup>)
+compensation term to the renormalization-scale variations, which
+reduces their magnitude for soft emissions, as described in
+<ref>Mre16</ref>. 
 </flag> 
  
 </chapter> 

@@ -338,6 +338,9 @@ public:
   // Check whether input openend with { not yet closed with }.
   bool unfinishedInput() {return lineSaved;}
 
+  // Useful auxiliary function, made public for string handling
+  string toLower(const string& name);
+
 private:
 
   // Pointer to various information on the generation.
@@ -389,7 +392,6 @@ private:
   void initTunePP(int ppTune);
 
   // Useful functions for string handling.
-  string toLower(const string& name);
   bool   boolString(string tag);
   string attributeValue(string line, string attribute);
   bool   boolAttributeValue(string line, string attribute);

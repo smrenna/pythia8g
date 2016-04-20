@@ -142,6 +142,15 @@ public:
   // ME corrections and kinematics that may give failure.
   virtual bool branch( Event& event, bool isInterleaved = false);
 
+  // Helper method to initialize uncertainty bands
+  bool initUncertainties();
+
+  // Helper method to calculate uncertainty bands
+  void calcUncertainties(vector<double>&,vector<bool>&,TimeDipoleEnd*,Particle*,Particle*);
+
+  // Flag to indicate if uncertainty variations should be done
+  bool doUncertaintyVarNow;
+  
   // Tell which system was the last processed one.
   virtual int system() const {return iSysSel;};
 
@@ -228,7 +237,8 @@ private:
 
   // Constants: could only be changed in the code itself.
   static const double MCMIN, MBMIN, SIMPLIFYROOT, XMARGIN, XMARGINCOMB,
-         TINYPDF, LARGEM2, THRESHM2, LAMBDA3MARGIN, WEAKPSWEIGHT, WG2QEXTRA;
+         TINYPDF, LARGEM2, THRESHM2, LAMBDA3MARGIN, WEAKPSWEIGHT, WG2QEXTRA,
+         REJECTFACTOR, PROBLIMIT;
   // Rescatter: try to fix up recoil between systems
   static const bool   FIXRESCATTER, VETONEGENERGY;
   static const double MAXVIRTUALITYFRACTION, MAXNEGENERGYFRACTION;
@@ -351,9 +361,11 @@ private:
   vector<int> weak2to2lines;
   int weakHardSize;
 
-  // Store indices of uncertainty variations relevant to TimeShower
-  vector<int> iUVarQCD, iUVarQED;
-
+  // Store uncertainty variations relevant to TimeShower
+  int nUncertaintyVariations, nVarQCD;
+  map<int,double> varG2GGmuRfac, varQ2QGmuRfac, varG2QQmuRfac, varX2XGmuRfac;
+  map<int,double> varG2GGcNS, varQ2QGcNS, varG2QQcNS, varX2XGcNS;
+  
 };
 
 //==========================================================================
