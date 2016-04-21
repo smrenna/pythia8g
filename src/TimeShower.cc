@@ -3739,8 +3739,18 @@ bool TimeShower::initUncertainties() {
   varG2QQmuRfac.clear();    varG2QQcNS.clear();
   // Get uncertainty variations from Settings (as list of strings to be parsed)
   vector<string> uVars=settingsPtr->wvec("UncertaintyVariations");
-  nUncertaintyVariations = uVars.size();
-  if (nUncertaintyVariations == 0) return false;  
+  nUncertaintyVariations = (int)uVars.size();
+  if (nUncertaintyVariations == 0) return false;
+  if( infoPtr->nWeights() < 1 ) {
+    infoPtr->setNWeights( nUncertaintyVariations+1 );
+    infoPtr->setWeightLabel(0,"Baseline");
+    for(int iWeight=1; iWeight <= nUncertaintyVariations; ++iWeight) {
+      string uVarString = uVars[iWeight-1];
+      int iEnd=uVarString.find(" ",0);
+      string valueString = uVarString.substr(0,iEnd);
+      infoPtr->setWeightLabel(iWeight,valueString);
+    }
+  }
   // List of keywords recognised by TimeShower
   vector<string> keys;
   keys.push_back("fsr:muRfac");
@@ -3845,29 +3855,28 @@ void TimeShower::calcUncertainties(vector<double>& uVarFac,vector<bool>& doVar,
       // Apply soft correction factor to X2XG
       double facCorr = 1.;
       if (idEmt == 21 && uVarMuSoftCorr) {
-	// Use smallest alphaS and b0, to make the compensation conservative
-	int nf = 5;
-	if (dip->pT2 < pow2(mc)) nf = 3;
-	else if (dip->pT2 < pow2(mb)) nf = 4;
-	double alphaScorr = alphaS.alphaS(dip->m2Dip);
-	double facSoft    = alphaScorr*(33-2*nf)/6./M_PI;
-	double zeta = 1.-dip->z;
-	if (idRad == 21) zeta = min(dip->z,1-dip->z);
-	facCorr = 1. + (1.-zeta) * facSoft * log(valFac);
+          // Use smallest alphaS and b0, to make the compensation conservative
+          int nf = 5;
+          if (dip->pT2 < pow2(mc)) nf = 3;
+          else if (dip->pT2 < pow2(mb)) nf = 4;
+          double alphaScorr = alphaS.alphaS(dip->m2Dip);
+          double facSoft    = alphaScorr*(33-2*nf)/6./M_PI;
+          double zeta = 1.-dip->z;
+          if (idRad == 21) zeta = min(dip->z,1-dip->z);
+          facCorr = 1. + (1.-zeta) * facSoft * log(valFac);
       }
       // Apply correction factor here for emission processes
       double alphaSfac   = alphaSratio * facCorr;
       // Limit absolute variation to +/- 0.2
       if (alphaSfac > 1.)
-	alphaSfac = min(alphaSfac,(alphaSbaseline+0.2)/alphaSbaseline);
+          alphaSfac = min(alphaSfac,(alphaSbaseline+0.2)/alphaSbaseline);
       else if (alphaSbaseline > 0.2)
-	alphaSfac = max(alphaSfac,(alphaSbaseline-0.2)/alphaSbaseline);
+          alphaSfac = max(alphaSfac,(alphaSbaseline-0.2)/alphaSbaseline);
       uVarFac[iWeight] *= alphaSfac;
       doVar[iWeight] = true;
     }
-
     // QCD finite-term variations (only when no MECs)
-    if (dip->MEtype == 0) varPtr = &dummy;
+    if (dip->MEtype != 0) varPtr = &dummy;
     else if (idEmt == 21 && idRad == 21) varPtr = &varG2GGcNS;
     else if (idEmt == 21 && abs(idRad) <= 8) varPtr = &varQ2QGcNS;
     else if (idEmt == 21) varPtr = &varX2XGcNS;
@@ -3886,13 +3895,13 @@ void TimeShower::calcUncertainties(vector<double>& uVarFac,vector<bool>& doVar,
       double denom = 1.;
       // G->GG
       if (idEmt == 21 && idRad == 21)
-	denom = pow2(1. - z * (1.-z)) / (z*(1.-z));
+          denom = pow2(1. - z * (1.-z)) / (z*(1.-z));
       // Q->QG
       else if (idEmt == 21)
-	denom = (1. + pow2(z)) / (1. - z);
+          denom = (1. + pow2(z)) / (1. - z);
       // G->QQ
       else
-	denom = pow2(z) + pow2(1. - z);
+          denom = pow2(z) + pow2(1. - z);
       // Compute reweight ratio
       uVarFac[iWeight] *= 1. + num/denom;
       doVar[iWeight] = true;

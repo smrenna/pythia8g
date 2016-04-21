@@ -557,7 +557,7 @@ private:
 
   // Set number and labels of weights (for uncertainty evaluations)
   void setNWeights(int mWeights) {
-    weightSave.resize(max(1,mWeights));
+    weightSave.resize(max(1,mWeights), 1.0);
     weightLabelSave.resize(max(1,mWeights));
     for (int i=1; i<mWeights; ++i) weightLabelSave[i]="";
   }

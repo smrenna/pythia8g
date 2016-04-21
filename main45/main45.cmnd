@@ -20,6 +20,8 @@ Next:numberShowProcess = 0         ! print process record n times
 Next:numberShowEvent = 1          ! print event record n times
 Stat:showPartonLevel = on          ! additional statistics on MPI
 
+Tune:ee = 4
+
 # random seed
 Random:setSeed = on
 Random:seed = 174
@@ -62,7 +64,7 @@ TimeShower:MEcorrections = off
 ParticleDecays:limitTau0 = On
 ParticleDecays:tau0Max = 100.0
 
-! Uncertainties:MuSoftCorr = off
+UncertaintyVariations:muSoftCorr = off
 UncertaintyVariations = { A fsr:muRfac 0.5 isr:muR 0.5,
 B fsr:muRfac 2.0 isr:muR 2.0,
 C fsr:cNS 3.0, 
