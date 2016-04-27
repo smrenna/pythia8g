@@ -1,0 +1,69 @@
+! File: main45.cmnd
+! This file contains commands to be read in for a Pythia8 run.
+! Lines not beginning with a letter or digit are comments.
+! Names are case-insensitive  -  but spellings-sensitive!
+! The changes here are illustrative, not always physics-motivated.
+
+! 1) Settings that will be used in a main program.
+Main:numberOfEvents = 100          ! number of events to generate
+Main:timesAllowErrors = 3          ! abort run after this many flawed events
+
+! 2) Settings related to output in init(), next() and stat().
+Init:showChangedSettings = on      ! list changed settings
+Init:showAllSettings = off         ! list all settings
+Init:showChangedParticleData = on  ! list changed particle data
+Init:showAllParticleData = off     ! list all particle data
+Next:numberCount = 100            ! print message every n events
+Next:numberShowLHA = 0             ! print LHA information n times
+Next:numberShowInfo = 0            ! print event information n times
+Next:numberShowProcess = 0         ! print process record n times
+Next:numberShowEvent = 1          ! print event record n times
+Stat:showPartonLevel = on          ! additional statistics on MPI
+
+# random seed
+Random:setSeed = on
+Random:seed = 174
+
+TimeShower:renormMultFac = 0.25
+
+# Beam parameter settings.
+Beams:idA = 11                 ! first beam, p = 2212, pbar = -2212
+Beams:idB = -11                ! second beam, p = 2212, pbar = -2212
+Beams:eCM = 91.2               ! CM energy of collision
+#Main:spareWord1 = CMS_2013_I1265659
+Main:spareWord1 = ALEPH_2004_S5765862
+Main:spareWord2 = test2.yoda
+Main:spareMode1 = 0
+
+# Pythia 8 settings for LEP
+# Hadronic decays including b quarks, with ISR photons switched off
+WeakSingleBoson:ffbar2gmZ = on
+23:onMode = off
+23:onIfAny = 1 2 3 4 5
+PDF:lepton = off
+SpaceShower:QEDshowerByL = off
+
+# Process setup
+#HardQCD:all = on
+
+
+# Set cuts
+# Use this for hard leading-jets in a certain pT window
+#PhaseSpace:pTHatMin = 50  # min pT
+#PhaseSpace:pTHatMax = 7000   # max pT
+
+# Use this for hard leading-jets in a certain mHat window
+#PhaseSpace:mHatMin = 0   # min mHat
+#PhaseSpace:mHatMax = 7000   # max mHat
+TimeShower:MEcorrections = off
+
+
+# Makes particles with c*tau > 10 mm stable:
+ParticleDecays:limitTau0 = On
+ParticleDecays:tau0Max = 100.0
+
+Uncertainties:MuSoftCorr = off
+UncertaintyVariation A fsr:muR 0.5 isr:muR 0.5
+UncertaintyVariation B fsr:muR 2.0 isr:muR 2.0
+UncertaintyVariation C fsr:cNS 3.0 
+UncertaintyVariation D fsr:cNS -0.5   
