@@ -3862,7 +3862,7 @@ void TimeShower::calcUncertainties(bool accept, double pAccept,
     else if (idEmt == 21 && idRad == 21) varPtr = &varG2GGcNS;
     else if (idEmt == 21 && abs(idRad) <= 8) varPtr = &varQ2QGcNS;
     else if (idEmt == 21) varPtr = &varX2XGcNS;
-    else if (idRad == 21 && abs(idEmt) <= 8) varPtr = &varG2QQcNS;
+    else if (abs(idRad) <= 8 && abs(idEmt) <= 8) varPtr = &varG2QQcNS;
     else varPtr = &dummy;
     for (itVar = varPtr->begin(); itVar != varPtr->end(); ++itVar) {
       int iWeight   = itVar->first;
