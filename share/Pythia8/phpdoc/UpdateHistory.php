@@ -39,7 +39,7 @@ but this should only affect a small part of the user code.
  
 <ul> 
  
-<li>8.218: 18 April 2016 
+<li>8.218: 29 April 2016 
 <ul> 
  
 <li>An interface to the Python programming language has been introduced, 
@@ -47,6 +47,18 @@ see <?php $filepath = $_GET["filepath"];
 echo "<a href='APythonInterface.php?filepath=".$filepath."' target='page'>";?>A Python Interface</a> for details. 
 Various minor changes in the C++ code have been done in order to permit 
 the automatic generation of the interface.</li> 
+ 
+<li>Included a new framework for automated parton-shower uncertainty bands. 
+Variations of the QCD renormalisation scale for both initial- and 
+final-state showers can now be computed by Pythia on the fly, and are 
+provided as a list of alternative weights for each event, representing 
+the probability that the given event would have occurred under different 
+shower assumptions. So-called "nonsingular terms" can also be added to 
+the splitting kernels to estimate the possible effect of missing 
+matrix-element corrections. Full documentation is found on the 
+<?php $filepath = $_GET["filepath"];
+echo "<a href='Variations.php?filepath=".$filepath."' target='page'>";?>Automated Shower Variations</a> page, 
+and a paper is due to appear on arXiv shortly.</li> 
  
 <li>When a final-state <i>g &rarr; g g</i> branching happens with 
 a massive recoiler, radiation in the recoiler direction is now 
@@ -75,7 +87,10 @@ weight keys, and improve parsing.</li>
 <li>A new class allows PDF data files in the lhagrid1 format, 
 with some restrictions, to be read and used. This does not replace 
 all that you can do with a complete LHAPDF6 installation, but at 
-least permits some simple studies without LHAPDF6 + Boost.</li> 
+least permits some simple studies without LHAPDF6 + Boost. 
+New example <code>main55.cc</code> illustrates this, and event 
+properties for an intermediate spinless resonance in 
+<i>&gamma; + &gamma; &rarr; &gamma; + &gamma;</i> at 750 GeV.</li> 
  
 <li>Four Pomeron PDF sets from the ACTW study [<a href="Bibliography.php" target="page">Alv99</a>] now 
 implemented.</li> 
@@ -144,6 +159,11 @@ embedded blanks, and broken up across several lines. See further the
 <?php $filepath = $_GET["filepath"];
 echo "<a href='SettingsScheme.php?filepath=".$filepath."' target='page'>";?>Settings Scheme</a> description.</li> 
  
+<li>The <code>Settings::toLower</code> method used to convert a string 
+to lowercase, and also trim it from initial or trailing blanks and special 
+characters, now moved to <code>PythiaStdlib.h</code> so it can be used 
+more generally. Other code changes accordingly.</li> 
+ 
 <li>Remove many rarely (if ever) used <code>ostream& os = cout</code> 
 optional arguments in favour of hardcoded <code>cout</code> in the code. 
 Eliminates some redundancy of methods.</li> 
@@ -163,6 +183,9 @@ corrected. Thanks to Florian Koenig.</li>
  
 <li>Allow for lightest neutralino not to decay as a resonance.</li> 
  
+<li>Do not switch off the Breit-Wigner width treatment of a resonance 
+as easily as previously, but only if the width is below 1e-6 GeV.</li> 
+ 
 <li>Make some <code>SlowJet</code> methods virtual to allow derived 
 classes with modified properties.</li> 
  
@@ -170,6 +193,12 @@ classes with modified properties.</li>
  
 <li>Corrected typos where some bottomonium long-distance matrix element 
 had been set larger than normally assumed.</li> 
+ 
+<li>Fixed typo potentially giving incorrect colour flow in resonance 
+decays.</li> 
+ 
+<li>Fixed an out-of-bounds array access in HelicityMatrixElements. 
+Thanks to Vittorio Zecca.</li> 
  
 <li>Fixed problem with the SLHAinterface not being zeroed-out when 
 using repeated subruns.</li> 

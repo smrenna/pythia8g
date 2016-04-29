@@ -100,9 +100,12 @@ public:
   long   nSelected()   const {return nSel;}
   long   nAccepted()   const {return nAcc;}
   double weightSum()   const {return wtAccSum;}
-  double sigmaSelMC()  {if (nTry > nTryStat) sigmaDelta(); return sigmaAvg;}
-  double sigmaMC()     {if (nTry > nTryStat) sigmaDelta(); return sigmaFin;}
-  double deltaMC()     {if (nTry > nTryStat) sigmaDelta(); return deltaFin;}
+  double sigmaSelMC( bool doAccumulate = true)
+    { if (nTry > nTryStat && doAccumulate) sigmaDelta(); return sigmaAvg;}
+  double sigmaMC(    bool doAccumulate = true)
+    { if (nTry > nTryStat && doAccumulate) sigmaDelta(); return sigmaFin;}
+  double deltaMC(    bool doAccumulate = true)
+    { if (nTry > nTryStat && doAccumulate) sigmaDelta(); return deltaFin;}
 
   // Some kinematics quantities.
   int    id1()         const {return sigmaProcessPtr->id(1);}
@@ -188,7 +191,7 @@ private:
   long nTryRequested, nSelRequested, nAccRequested;
 
   // Temporary summand for handling (weighted) events when vetoes are applied.
-  double sigmaTemp;
+  double sigmaTemp, sigma2Temp;
 
   // Estimate integrated cross section and its uncertainty.
   void sigmaDelta();
