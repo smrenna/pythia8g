@@ -1,4 +1,31 @@
-<chapter name="Update History"> 
+<html>
+<head>
+<title>Update History</title>
+<link rel="stylesheet" type="text/css" href="pythia.css"/>
+<link rel="shortcut icon" href="pythia32.gif"/>
+</head>
+<body>
+
+<script language=javascript type=text/javascript>
+function stopRKey(evt) {
+var evt = (evt) ? evt : ((event) ? event : null);
+var node = (evt.target) ? evt.target :((evt.srcElement) ? evt.srcElement : null);
+if ((evt.keyCode == 13) && (node.type=="text"))
+{return false;}
+}
+
+document.onkeypress = stopRKey;
+</script>
+<?php
+if($_POST['saved'] == 1) {
+if($_POST['filepath'] != "files/") {
+echo "<font color='red'>SETTINGS SAVED TO FILE</font><br/><br/>"; }
+else {
+echo "<font color='red'>NO FILE SELECTED YET.. PLEASE DO SO </font><a href='SaveSettings.php'>HERE</a><br/><br/>"; }
+}
+?>
+
+<form method='post' action='UpdateHistory.php'>
  
 <h2>Update History</h2> 
  
@@ -16,7 +43,8 @@ but this should only affect a small part of the user code.
 <ul> 
  
 <li>An interface to the Python programming language has been introduced, 
-see <aloc href="APythonInterface">A Python Interface</aloc> for details. 
+see <?php $filepath = $_GET["filepath"];
+echo "<a href='APythonInterface.php?filepath=".$filepath."' target='page'>";?>A Python Interface</a> for details. 
 Various minor changes in the C++ code have been done in order to permit 
 the automatic generation of the interface.</li> 
  
@@ -28,10 +56,11 @@ the probability that the given event would have occurred under different
 shower assumptions. So-called "nonsingular terms" can also be added to 
 the splitting kernels to estimate the possible effect of missing 
 matrix-element corrections. Full documentation is found on the 
-<aloc href="Variations">Automated Shower Variations</aloc> page, 
+<?php $filepath = $_GET["filepath"];
+echo "<a href='Variations.php?filepath=".$filepath."' target='page'>";?>Automated Shower Variations</a> page, 
 and a paper is due to appear on arXiv shortly.</li> 
  
-<li>When a final-state <ei>g &rarr; g g</ei> branching happens with 
+<li>When a final-state <i>g &rarr; g g</i> branching happens with 
 a massive recoiler, radiation in the recoiler direction is now 
 by default further suppressed to respect the "dead cone" effect, 
 see new switch <code>TimeShower:recoilDeadCone</code>. Furthermore 
@@ -40,7 +69,7 @@ attempts to guess the most relevant ME correction when the
 correct choice is not known or implemented. Thanks to 
 Jesse Thaler, Michele Selvaggi and Fabio Maltoni.</li> 
  
-<li>The <ei>gamma-gamma</ei> hard-process machinery has been extended to 
+<li>The <i>gamma-gamma</i> hard-process machinery has been extended to 
 convolute the partonic PDFs in a photon with the flux of photons inside 
 a lepton. The description is intended for the region of quasireal photons, 
 but full kinematics is implemented.</li> 
@@ -61,27 +90,28 @@ all that you can do with a complete LHAPDF6 installation, but at
 least permits some simple studies without LHAPDF6 + Boost. 
 New example <code>main55.cc</code> illustrates this, and event 
 properties for an intermediate spinless resonance in 
-<ei>&gamma; + &gamma; &rarr; &gamma; + &gamma;</ei> at 750 GeV.</li> 
+<i>&gamma; + &gamma; &rarr; &gamma; + &gamma;</i> at 750 GeV.</li> 
  
-<li>Four Pomeron PDF sets from the ACTW study <ref>Alv99</ref> now 
+<li>Four Pomeron PDF sets from the ACTW study [<a href="Bibliography.php" target="page">Alv99</a>] now 
 implemented.</li> 
  
 <li>The three Pomeron H1 Jets PDF data files have been joined to one. 
 </li> 
  
-<li>The <aloc href="ExternalDecays">external decays</aloc> interface has 
+<li>The <?php $filepath = $_GET["filepath"];
+echo "<a href='ExternalDecays.php?filepath=".$filepath."' target='page'>";?>external decays</a> interface has 
 been extended by a new method that allows sequential decays to be done 
 in one call.</li> 
  
-<li>Increased possibilities to set the <ei>epsilon</ei> and 
-<ei>alpha'</ei> parameters of the Pomeron trajectory for 
+<li>Increased possibilities to set the <i>epsilon</i> and 
+<i>alpha'</i> parameters of the Pomeron trajectory for 
 hard-diffraction Pomeron fluxes.</li> 
  
-<li>Extrapolation of PDFs to small <ei>x</ei> values when 
+<li>Extrapolation of PDFs to small <i>x</i> values when 
 <code>PDF:extrapolate = on</code> now extended to more cases.</li> 
  
 <li>New flag <code>TimeShower:QEDshowerByOther</code> allows charged 
-resonances, like the <ei>W^+-</ei>, to radiate photons.</li> 
+resonances, like the <i>W^+-</i>, to radiate photons.</li> 
  
 <li>The jet matching algorithm in <code>JetMatching.h</code> has been 
 extended to better handle heavy quarks, heavy colored particles (such 
@@ -107,13 +137,15 @@ event vetoes and event reweighting that are applied by the leading-order
 ME+PS merging prescriptions.</li> 
  
 <li>Changes to the merging classes to allow for a postponed CKKW-L 
-event veto. (See end of <aloc href="CKKWLMerging">CKKW-L Merging</aloc> 
+event veto. (See end of <?php $filepath = $_GET["filepath"];
+echo "<a href='CKKWLMerging.php?filepath=".$filepath."' target='page'>";?>CKKW-L Merging</a> 
 page for details.)</li> 
  
 <li>Small changes to virtual parton shower functions, and to the merging 
 classes, to prepare ME+PS merging with the Vincia parton shower.</li> 
  
-<li>The <aloc href="HepMCInterface">HepMC</aloc> interface has been 
+<li>The <?php $filepath = $_GET["filepath"];
+echo "<a href='HepMCInterface.php?filepath=".$filepath."' target='page'>";?>HepMC</a> interface has been 
 modified such that the detection of unhadronized quarks or gluons 
 leads to an exception being thrown, so that the user can decide what 
 action to take. See further new/renamed <code>free_parton_exception</code> 
@@ -124,7 +156,8 @@ style. Thanks to James Monk.</li>
 <li>A class <code>WVec</code> has been introduced to store vectors of 
 strings. The delimiters { } are introduced to provide input with 
 embedded blanks, and broken up across several lines. See further the 
-<aloc href="SettingsScheme">Settings Scheme</aloc> description.</li> 
+<?php $filepath = $_GET["filepath"];
+echo "<a href='SettingsScheme.php?filepath=".$filepath."' target='page'>";?>Settings Scheme</a> description.</li> 
  
 <li>The <code>Settings::toLower</code> method used to convert a string 
 to lowercase, and also trim it from initial or trailing blanks and special 
@@ -188,22 +221,25 @@ php version of the manual recognize them.</li>
  
 <li>Ilkka Helenius joins as new PYTHIA co-author.</li> 
  
-<li>A new machinery for <ei>gamma-gamma</ei> collisions is now available, 
-see <aloc href="PhotonPhoton">Photon-photon Interactions</aloc>. 
+<li>A new machinery for <i>gamma-gamma</i> collisions is now available, 
+see <?php $filepath = $_GET["filepath"];
+echo "<a href='PhotonPhoton.php?filepath=".$filepath."' target='page'>";?>Photon-photon Interactions</a>. 
 So far only hard processes can be generated, along with parton showers 
 and hadronization, but without multiparton interactions. The CJKL parton 
 distributions of the photon have been implemented and are used.</li> 
  
-<li>Double production of charmonium and bottomonium <ei>3S1</ei> states 
+<li>Double production of charmonium and bottomonium <i>3S1</i> states 
 is now available, but with only the colour-singlet processes included, 
-see <aloc href="OniaProcesses">Onia Processes</aloc> for details.</li> 
+see <?php $filepath = $_GET["filepath"];
+echo "<a href='OniaProcesses.php?filepath=".$filepath."' target='page'>";?>Onia Processes</a> for details.</li> 
  
-<li>Weak merging implemented, i.e. <ei>W</ei> gauge bosons can be 
+<li>Weak merging implemented, i.e. <i>W</i> gauge bosons can be 
 produced either as part of the hard matrix element or in the parton 
 shower, and a proper treatment merges these two possibilities consistently. 
-See the <aloc href="CKKWLMerging">CKKW-L</aloc> page for details.</li> 
+See the <?php $filepath = $_GET["filepath"];
+echo "<a href='CKKWLMerging.php?filepath=".$filepath."' target='page'>";?>CKKW-L</a> page for details.</li> 
  
-<li>Running <ei>alpha_em</ei> in merging description.</li> 
+<li>Running <i>alpha_em</i> in merging description.</li> 
  
 <li>Improved interface to external parton showers, such as 
 <a href="http://vincia.hepforge.org/" target="_top">VINCIA</a> and 
@@ -211,7 +247,8 @@ See the <aloc href="CKKWLMerging">CKKW-L</aloc> page for details.</li>
 so that these now also can use the various matching and merging 
 frameworks implemented in Pythia.</li> 
  
-<li>New options in the <aloc href="JetMatching">jet matching</aloc> 
+<li>New options in the <?php $filepath = $_GET["filepath"];
+echo "<a href='JetMatching.php?filepath=".$filepath."' target='page'>";?>jet matching</a> 
 framework, such that expert users can use their own veto code for 
 Madgraph-style jet matching.</li> 
  
@@ -219,14 +256,16 @@ Madgraph-style jet matching.</li>
 Pythia, by wrapping the Madgraph5_aMC@NLO executable inside a new 
 <code>LHAupMadgraph</code> class that derives from the Pythia 
 <code>LHAup</code> base class. 
-See <aloc href="MadGraph5Processes">MadGraph5 Processes</aloc> 
+See <?php $filepath = $_GET["filepath"];
+echo "<a href='MadGraph5Processes.php?filepath=".$filepath."' target='page'>";?>MadGraph5 Processes</a> 
 for a brief overview, and <code>examples/main34.cc</code> for an example 
 how to use it. Still at an experimental stage, and only tested for 
 Madgraph5_aMC@NLO v2.3.3.</li> 
  
 <li>By default the program will now assign the PYTHIA mass for 
-massless <ei>c</ei> and <ei>b</ei> quarks in Les Houches input, see 
-<code><aloc href="LesHouchesAccord">LesHouches:setQuarkMass</aloc></code>. 
+massless <i>c</i> and <i>b</i> quarks in Les Houches input, see 
+<code><?php $filepath = $_GET["filepath"];
+echo "<a href='LesHouchesAccord.php?filepath=".$filepath."' target='page'>";?>LesHouches:setQuarkMass</a></code>. 
 Usually a logical recoiler is found that can transfer the needed 
 four-momentum to the quark. The already existing machinery for 
 giving masses to massless leptons has been expanded to use the more 
@@ -244,9 +283,9 @@ hard-process event plane. Thanks to Radek Zlebcik.</li>
  
 <li>Some further new options and minor additions in the machinery for 
 hard diffraction. This includes three options for setting the impact 
-parameter for the <ei>Pomeron p</ei> subcollision, a possibility to 
+parameter for the <i>Pomeron p</i> subcollision, a possibility to 
 access both it and the impact parameter both for the original 
-<ei>p p</ei>, and options to rescale the Pomeron flux, including one 
+<i>p p</i>, and options to rescale the Pomeron flux, including one 
 that uses the MBR renormalization. Some default values changed, notably 
 that now MPI is checked.</li> 
  
@@ -301,7 +340,7 @@ decays to three quarks (typically with baryon number violation),
 whereof two have such a small invariant mass that they collapse to a 
 diquark. Thanks to Cristiano Alpigiani.</li> 
  
-<li>Bug fix for excited quarks <ei>q^*</ei> and leptons <ei>l^*</ei>, 
+<li>Bug fix for excited quarks <i>q^*</i> and leptons <i>l^*</i>, 
 that if new decay channels were introduced they could incorrectly make 
 use of the matrix element expressions for the existing decay modes. 
 Thanks to Simone Amoroso.</li> 
@@ -359,19 +398,23 @@ Thanks to Radek Zlebcik.</li>
 <li>Included new weighting facilities in initial- and final-state showers. 
 This allows to consistently enhance rare shower branchings without 
 impairing the no-emission probabilities, see 
-<aloc href="UserHooks">User Hooks</aloc>. A new <code>main63.cc</code>, 
+<?php $filepath = $_GET["filepath"];
+echo "<a href='UserHooks.php?filepath=".$filepath."' target='page'>";?>User Hooks</a>. A new <code>main63.cc</code>, 
 together with <code>main63.cmnd</code>, illustrates this feature.</li> 
  
 <li>Added new functionality to time- and spacelike showers to streamline 
 merging with external shower plugins, see 
-<aloc href="ImplementNewShowers">Implement New Showers</aloc>.</li> 
+<?php $filepath = $_GET["filepath"];
+echo "<a href='ImplementNewShowers.php?filepath=".$filepath."' target='page'>";?>Implement New Showers</a>.</li> 
  
 <li>New possibility to access hadronization parameters in each step of 
 the hadronization process, and to veto individual hadrons, see 
-<aloc href="UserHooks">User Hooks</aloc>. Thanks to Christian Bierlich. 
+<?php $filepath = $_GET["filepath"];
+echo "<a href='UserHooks.php?filepath=".$filepath."' target='page'>";?>User Hooks</a>. Thanks to Christian Bierlich. 
 </li> 
  
-<li>The <aloc href="ExternalDecays">EvtGen interface</aloc> has been 
+<li>The <?php $filepath = $_GET["filepath"];
+echo "<a href='ExternalDecays.php?filepath=".$filepath."' target='page'>";?>EvtGen interface</a> has been 
 expanded with the possibility to force a rare decay of some of the 
 particle species handled by EvtGen, with an event weight compensating 
 for this bias. New status codes 95 or 96 single out particles from a 
@@ -384,7 +427,8 @@ Thanks to Paolo Gunnellini.</li>
  
 <li>Added possibility to write Les Houches Event Files abiding to the 
 latest (v. 3) standard,see 
-<aloc href="LesHouchesAccord">Les Houches Accord</aloc>. The new 
+<?php $filepath = $_GET["filepath"];
+echo "<a href='LesHouchesAccord.php?filepath=".$filepath."' target='page'>";?>Les Houches Accord</a>. The new 
 <code>main64.cc</code> illustrates how to use the LHEF3 writer.</li> 
  
 <li>Fixes in the merging machinery, related to the scales associated 
@@ -433,13 +477,13 @@ now fixed. The corrections are 4003 &rarr; 4203, 4004 &rarr; 4204,
 4005 &rarr; 4205, 961 &rarr; 1061, 3124 &rarr; 3123, 3126 &rarr; 3124, 
 3144 &rarr; 3143, and 3146 &rarr; 3144.</li> 
  
-<li>For <ei>tau</ei> decay spin correlations the 
-<ei>f fbar &rarr; V &rarr; f fbar</ei> matrix element, 
-<ei>V = gamma/Z^0</ei> or <ei>W^+-</ei>, is now only used when the 
+<li>For <i>tau</i> decay spin correlations the 
+<i>f fbar &rarr; V &rarr; f fbar</i> matrix element, 
+<i>V = gamma/Z^0</i> or <i>W^+-</i>, is now only used when the 
 incoming fermion pair has no other daughters. Else the simpler 
-<ei>V &rarr; f fbar</ei> matrix element is used.</li> 
+<i>V &rarr; f fbar</i> matrix element is used.</li> 
  
-<li>Minor technical changes, to allow for external <ei>pT</ei>-unordered 
+<li>Minor technical changes, to allow for external <i>pT</i>-unordered 
 parton showers. No effect for the internal showers.</li> 
  
 <li>The SLHA reading operation has become significantly less verbose: 
@@ -453,7 +497,7 @@ machinery was used to calculate decay properties. This was the case, in
 particular, when internal SUSY processes were invoked to generate events. 
 </li> 
  
-<li>Minor correction in the cross section for <ei>f fbar &rarr; G*</ei> 
+<li>Minor correction in the cross section for <i>f fbar &rarr; G*</i> 
 for extra-dimensional processes.</li> 
  
 <li><code>main85.cc</code> has been updated so it can handle weighted 
@@ -466,7 +510,7 @@ are now changed.</li>
 roundoff in string fragmentation.</li> 
  
 <li>Introduce protection against numerical instability of companion quark 
-distribution in <ei>x &rarr; 1</ei> limit.</li> 
+distribution in <i>x &rarr; 1</i> limit.</li> 
  
 <li>Use the <code>PythiaStdlib.h</code> header rather than accessing 
 Stdlib directly in <code>SusyLesHouches.h</code>.</li> 
@@ -514,8 +558,8 @@ between two junctions is split up.</li>
 <li>Check that SK-I and SK-II colour reconnection machineries only 
 are called for event topologies they are set up to handle.</li> 
  
-<li>Bug fixes in partial widths of the <ei>W'</ei> boson. Results are 
-correct when the <ei>W'</ei> is a simply rescaled copy of the <ei>W</ei>, 
+<li>Bug fixes in partial widths of the <i>W'</i> boson. Results are 
+correct when the <i>W'</i> is a simply rescaled copy of the <i>W</i>, 
 but not for more general couplings. Thanks to Mihail Chizhov. </li> 
  
 <li>Minor fix in default location of PDF data files in the constructors. 
@@ -546,14 +590,14 @@ flip step.</li>
 <li>New <code>ColourReconnection:forceResonance</code> switch 
 allows an additional colour reconnection step after late resonance 
 decays. This is especially relevant for 
-<ei>H^0 &rarr; W^+ W^- / Z^0 Z^0  &rarr; q_1 qbar_2 q_3 qbar_4</ei>, 
+<i>H^0 &rarr; W^+ W^- / Z^0 Z^0  &rarr; q_1 qbar_2 q_3 qbar_4</i>, 
 since the Higgs is so long-lived that its decay is well separated 
 from the rest of the event.</li> 
  
 <li>The old SK I and SK II colour reconnection models are now available. 
 These are specially aimed at the processes 
-<ei>e^+ e^- &rarr; W^+ W^- / Z^0 Z^0</ei>, but are also relevant for 
-<ei>H^0 &rarr; W^+ W^- / Z^0 Z^0</ei>. </li> 
+<i>e^+ e^- &rarr; W^+ W^- / Z^0 Z^0</i>, but are also relevant for 
+<i>H^0 &rarr; W^+ W^- / Z^0 Z^0</i>. </li> 
  
 <li>Colour reconnection also made possible, optionally, for the 
 <code>forceHadronLevel</code> method.</li> 
@@ -572,12 +616,12 @@ mode, which requires no Boost headers. The new configure option
 <code>--with-lhapdf6-plugin=LHAPDF6.h</code> uses native mode, and 
 then requires Boost headers.</li> 
  
-<li>The LHAPDF6 PDF values are frozen at the respective <ei>x</ei> 
-and <ei>Q^2</ei> boundary if the <ei>(x, Q^2)</ei> pair falls outside 
+<li>The LHAPDF6 PDF values are frozen at the respective <i>x</i> 
+and <i>Q^2</i> boundary if the <i>(x, Q^2)</i> pair falls outside 
 the fit region.</li> 
  
 <li>New functions to extract the fit boundaries, the current 
-<ei>alpha_s</ei> value, and the quark masses from LHADPF6.</li> 
+<i>alpha_s</i> value, and the quark masses from LHADPF6.</li> 
  
 <li>New option in the HepMC interface, whereby PYTHIA particles can be 
 appended to an existing HepMC event. Thanks to Mikhail Kirsanov.</li> 
@@ -630,12 +674,12 @@ of numerical inconsistencies in input.</li>
 <li>Updated EvtGen interface, to allow a pointer to an FSR engine to be 
 passed. Thanks to Torben Ferber.</li> 
  
-<li>Spin information for <ei>tau</ei> leptons now also set up for 
-<ei>Z'</ei> and <ei>W'</ei> decays.</li> 
+<li>Spin information for <i>tau</i> leptons now also set up for 
+<i>Z'</i> and <i>W'</i> decays.</li> 
  
 <li>New method<code>AlphaStrong::setThresholds(...)</code> allows to 
 set the charm, bottom and top flavour-threshold masses used for the 
-running of <ei>alpha_strong</ei>.</li> 
+running of <i>alpha_strong</i>.</li> 
  
 <li>New option for the <code>Event::list()</code> methods allows to show 
 momenta with more decimal digits.</li> 
@@ -674,7 +718,7 @@ photon+jet processes.</li>
 <li>Inserted missing endtag that corrupted the <code>Tunes.php</code> 
 page. Thanks to Tim Martin.</li> 
  
-<li>Minor fix for polarization sign when the <ei>tau</ei> polarization 
+<li>Minor fix for polarization sign when the <i>tau</i> polarization 
 is forced.</li> 
  
 <li>The meaning of the <code>HiggsXX:parity</code> options for CP mixing 
@@ -682,9 +726,9 @@ has been slightly modified and is better described.</li>
  
 <li>Clarification in the documentation that impact-parameter-enhancement 
 factor calculation for two hard processes does not work for the 
-<ei>x</ei>-dependent impact-parameter profile option.</li> 
+<i>x</i>-dependent impact-parameter profile option.</li> 
  
-<li>Fixed a factor <ei>sqrt(2)</ei> error in couplings for 
+<li>Fixed a factor <i>sqrt(2)</i> error in couplings for 
 chargino + squark pair production. Thanks to Michihisa Takeuchi.</li> 
  
 <li>Some minor bug fixes in the SUSY code, and some speed optimization 
@@ -749,9 +793,10 @@ The optional <code>make install</code> step will create a copy of
 used <code>examples/outref</code> subdirectory is moved to 
 <code>share/Pythia8/outref</code>.</li> 
  
-<li>Fifteen new <aloc href="Tunes">tunes</aloc> have been added, 
+<li>Fifteen new <?php $filepath = $_GET["filepath"];
+echo "<a href='Tunes.php?filepath=".$filepath."' target='page'>";?>tunes</a> have been added, 
 the MonashStar tune from CMS and fourteen A14 tunes from ATLAS 
-<ref>ATL14a</ref>. The latter correspond to central tunes for 
+[<a href="Bibliography.php" target="page">ATL14a</a>]. The latter correspond to central tunes for 
 four different PDF sets and ten variations in five (approximate) 
 eigenvector directions. Furthermore, now the chosen 
 <code>Tune:pp</code> implies the <code>Tune:ee</code> value 
@@ -767,7 +812,7 @@ processes, describing the pair production of excited leptons or
 neutrinos. Three-body contact-interaction decay modes of these 
 excited states have been introduced. A bug has been fixed that 
 gave the wrong helicity in decays for excited quarks, leptons and 
-neutrinos. Further, the <ei>gamma^*/Z^0/Z'^0</ei> can decay to a pair 
+neutrinos. Further, the <i>gamma^*/Z^0/Z'^0</i> can decay to a pair 
 of excited fermions provided that the channels are added to the 
 list of allowed ones. Based on code provided by Olga Igonkina.</li> 
  
@@ -790,7 +835,8 @@ renamed <code>wbj_lhef3.lhe</code>.
 copy of the ordinary event record, here with a history tracing 
 of the hard process closer to the PYTHIA 6 conventions.</li> 
  
-<li>The <aloc href="ProMCFiles">ProMC</aloc> input-output file format 
+<li>The <?php $filepath = $_GET["filepath"];
+echo "<a href='ProMCFiles.php?filepath=".$filepath."' target='page'>";?>ProMC</a> input-output file format 
 is now implemented among the libraries that can be 
 <code>configure</code>d to run with PYTHIA. An examples is provided 
 in <code>main46.cc</code>. Thanks to Sergei Chekanov.</li> 
@@ -803,8 +849,8 @@ Thanks to Mihoko Nojiri and Bryan Webber.</li>
  
 <li>New options 3 and 4 for <code>TimeShower:pTdampMatch</code> 
 and <code>SpaceShower:pTdampMatch</code>, with new default 3 for the 
-latter. The main effect is that, by default, <ei>t tbar</ei> 
-production (as a <ei>2 &rarr; 2</ei> process) obtains damped 
+latter. The main effect is that, by default, <i>t tbar</i> 
+production (as a <i>2 &rarr; 2</i> process) obtains damped 
 radiation above the process scale. Thanks to Andy Buckley 
 for suggestion.</li> 
  
@@ -875,7 +921,7 @@ code. The check on the consistency of decay tables has been removed.
 Improved warning/error printing in the SLHA interface.</li> 
  
 <li>Bug fix in new beam remnant model, so that it basically 
-operates like the old one for <ei>e^+e^-</ei> annihilation.</li> 
+operates like the old one for <i>e^+e^-</i> annihilation.</li> 
  
 <li>Two bug fixes in the new colour reconnection model, one for 
 diquarks at the ends of junction strings, and another to check that 
@@ -884,13 +930,13 @@ coloured resonances are processes with early resonance decays option.</li>
 <li>Bug fix for multiple <code>Pythia::init()</code> calls, where 
 beam contents were not properly reset. Thanks to Josh Bendavid.</li> 
  
-<li>Bug fix such that the valence content of a <ei>pi^0</ei>, 
-<ei>K^0_S</ei>, <ei>K^0_L</ei> and Pomeron is reselected for each 
+<li>Bug fix such that the valence content of a <i>pi^0</i>, 
+<i>K^0_S</i>, <i>K^0_L</i> and Pomeron is reselected for each 
 new event. Thanks to Radek Zlebcik.</li> 
  
-<li>Fix typo in constants of the <ei>tau &rarr; 3 pi</ei> current 
-for the amplitudes of the <ei>rho</ei>, <ei>rho(1450)</ei>, and 
-<ei>f2</ei>. Thanks to Ian Nugent.</li> 
+<li>Fix typo in constants of the <i>tau &rarr; 3 pi</i> current 
+for the amplitudes of the <i>rho</i>, <i>rho(1450)</i>, and 
+<i>f2</i>. Thanks to Ian Nugent.</li> 
  
 <li>Small bug fixes for string and ministring fragmentation, for the 
 case when a low-mass (order 2 GeV) system contains at least three 
@@ -899,7 +945,7 @@ string region.</li>
  
 <li>New parameter <code>BeamRemnants:reducedKTatHighY</code> introduced 
 to reduce technical problems with low-mass MPIs produced at high 
-rapidities when primordial <ei>kT</ei> is introduced.</li> 
+rapidities when primordial <i>kT</i> is introduced.</li> 
  
 <li>Small bug fix in the global-recoil option for timelike showers.</li> 
  
@@ -941,7 +987,7 @@ documents that are linked from the <code>htmldoc</code> and
 in-depth descriptions of various physics aspects than offered in 
 the html/php-formatted documentation. In addition to the official 
 main publication and the worksheet, currently notes on LO vs. NLO 
-PDFs and on the <ei>g &rarr; q qbar</ei> branching kernel are 
+PDFs and on the <i>g &rarr; q qbar</i> branching kernel are 
 included.</li> 
  
 <li>A new <code>include/Pythia8Plugins</code> directory collects 
@@ -1006,7 +1052,8 @@ when LHAPDF is not, is no longer required. The two new files
 interface code. The selection of PDF sets, notably for the proton, 
 has been extended to simplify mixing of internal and external PDF sets, 
 and it is now possible to specify different PDFs for the two incoming 
-protons at the LHC, see the <aloc href="PDFSelection">PDF Selection</aloc> 
+protons at the LHC, see the <?php $filepath = $_GET["filepath"];
+echo "<a href='PDFSelection.php?filepath=".$filepath."' target='page'>";?>PDF Selection</a> 
 description.</li> 
  
 <li>The new <code>LHEF3.h</code> file contains a generic interface for 
@@ -1014,7 +1061,8 @@ reading Les Houches Event Files of versions 1.0, 2.0 and 3.0. This
 allows more information to be read and studied by the author. Currently 
 PYTHIA itself makes little use of the information beyond the one in 1.0, 
 but it is available among the 
-<aloc href="EventInformation">Event Information</aloc>. 
+<?php $filepath = $_GET["filepath"];
+echo "<a href='EventInformation.php?filepath=".$filepath."' target='page'>";?>Event Information</a>. 
 Examples are found in <code>main37.cc</code> and <code>main38.cc</code>. 
 </li> 
  
@@ -1051,7 +1099,8 @@ These include <code>iTopCopy</code>, <code>iBotCopy</code>,
 <li>A number of deprecated <code>Pythia::init(...)</code> methods with 
 varying arguments have been removed. Instead call <code>init()</code> 
 without any arguments and use 
-<aloc href="BeamParameters">Beam Parameters</aloc> settings to 
+<?php $filepath = $_GET["filepath"];
+echo "<a href='BeamParameters.php?filepath=".$filepath."' target='page'>";?>Beam Parameters</a> settings to 
 specify beams and energies in different ways.</li> 
  
 <li>The deprecated <code>Pythia::statistics(...)</code> method has been 
@@ -1076,24 +1125,26 @@ tune that was default in 8.1 can be recovered with
 Also most other older tunes are based on <code>Tune:ee = 3</code>. 
 </li> 
  
-<li>Two new CMS underlying-event tunes <ref>CMS14</ref> and the ATLAS 
-AZ tune <ref>ATL14</ref> have been added as options.</li> 
+<li>Two new CMS underlying-event tunes [<a href="Bibliography.php" target="page">CMS14</a>] and the ATLAS 
+AZ tune [<a href="Bibliography.php" target="page">ATL14</a>] have been added as options.</li> 
  
-<li>The default handling of the <ei>g &rarr; q qbar</ei> splitting kernel 
+<li>The default handling of the <i>g &rarr; q qbar</i> splitting kernel 
 has been changed, affecting in particular heavy-flavour production. 
 <code>TimeShower:weightGluonToQuark</code> has been changed from 1 to 4 
 to do this. All old tunes are with the 1 value but, since the tunes are 
-not probing the detailed <ei>g &rarr; q qbar</ei> behaviour, this is 
+not probing the detailed <i>g &rarr; q qbar</i> behaviour, this is 
 not set as part of the tune options.</li> 
  
 <li>Christine O. Rasmussen joins as new PYTHIA collaboration member.</li> 
  
-<li>A new model for the handling of <aloc href="BeamRemnants">beam 
-remnants</aloc> as an option to the old one, which remains as default 
+<li>A new model for the handling of <?php $filepath = $_GET["filepath"];
+echo "<a href='BeamRemnants.php?filepath=".$filepath."' target='page'>";?>beam 
+remnants</a> as an option to the old one, which remains as default 
 for now.</li> 
  
-<li>Two new models for <aloc href="ColourReconnection">colour 
-reconnection</aloc>, one quite sophisticated and one simpler. 
+<li>Two new models for <?php $filepath = $_GET["filepath"];
+echo "<a href='ColourReconnection.php?filepath=".$filepath."' target='page'>";?>colour 
+reconnection</a>, one quite sophisticated and one simpler. 
 This involves several new classes and files. It also includes some 
 changes in the hadronization framework, notably for the handling of 
 junctions. The old model remains as default for now. The 
@@ -1114,7 +1165,8 @@ the different options should be set up.</li>
  
 <li>Several new features and improvements in the matching/merging 
 machinery. Notably the aMC@NLO matching scheme has been implemented, 
-see the <aloc href="aMCatNLOMatching">aMC@NLO Matching</aloc> 
+see the <?php $filepath = $_GET["filepath"];
+echo "<a href='aMCatNLOMatching.php?filepath=".$filepath."' target='page'>";?>aMC@NLO Matching</a> 
 description. To this end the global-recoil option of timelike showers 
 has been improved, and security checks have been introduced for 
 inaccurate LHEF input. A new <code>main89.cc</code> example has been 
@@ -1127,26 +1179,28 @@ to read SLHA information embedded in the input file or stream.</li>
 <li>The <code>Makefile</code>s have been updated to take into account 
 the changed structure of the HepMC interface.</li> 
  
-<li>The <ei>Z'</ei> production process has been updated to optionally 
+<li>The <i>Z'</i> production process has been updated to optionally 
 allow decay to a fourth generation of fermions, with universal or 
 non-universal couplings.</li> 
  
 <li>Introduction of a new Higgs CP-mixing parametrization via a mixing 
-angle <ei>phi</ei> as described in <aloc href="HiggsProcesses">Higgs 
-Processes</aloc>. The choice of the Higgs CP-mixing parametrization 
-now also affects the distributions of the <ei>tau</ei> decay products 
-from the processes <ei>H^0 &rarr; tau^+ tau^-</ei>. 
+angle <i>phi</i> as described in <?php $filepath = $_GET["filepath"];
+echo "<a href='HiggsProcesses.php?filepath=".$filepath."' target='page'>";?>Higgs 
+Processes</a>. The choice of the Higgs CP-mixing parametrization 
+now also affects the distributions of the <i>tau</i> decay products 
+from the processes <i>H^0 &rarr; tau^+ tau^-</i>. 
  
-<li>Bug fix in <ei>H^0 &rarr; W^+ W^- &rarr; 4 f</ei> matrix element 
+<li>Bug fix in <i>H^0 &rarr; W^+ W^- &rarr; 4 f</i> matrix element 
 for mixed CP-state case.</li> 
  
 <li>Various improvements and finer grain control for the determination 
-of <ei>tau</ei> decay correlations and <ei>tau</ei> polarizations. By 
-default the decays of <ei>tau</ei> pairs from known resonance decays 
+of <i>tau</i> decay correlations and <i>tau</i> polarizations. By 
+default the decays of <i>tau</i> pairs from known resonance decays 
 in Les Houches input are now correlated. 
 The <code>ParticleDecays:sophisticatedTau</code> mode 
-in <aloc href="ParticleDecays">Particle Decays</aloc> has been renamed 
-<code>TauDecays:mode</code>, as well as all <ei>tau</ei>-related 
+in <?php $filepath = $_GET["filepath"];
+echo "<a href='ParticleDecays.php?filepath=".$filepath."' target='page'>";?>Particle Decays</a> has been renamed 
+<code>TauDecays:mode</code>, as well as all <i>tau</i>-related 
 <code>ParticleDecay</code> options, with two new options of 
 using only the internal machinery to determine correlations and 
 polarizations, and only using the provided SPINUP digit from Les 
@@ -1158,7 +1212,7 @@ introduced to control the interpretation of the SPINUP digit.
 from its three-momentum and mass, in order to limit mismatches from 
 limited numerical precision in the input values.</li> 
  
-<li>Bug fix in the two-loop running <ei>alpha_s</ei>, for the matching 
+<li>Bug fix in the two-loop running <i>alpha_s</i>, for the matching 
 to six flavours at the top mass.</li> 
  
 <li>Eliminate harmless compiler warnings for <code>FJcore</code>.</li> 
@@ -1170,6 +1224,7 @@ to six flavours at the top mass.</li>
  
 </ul> 
  
-</chapter> 
+</body>
+</html>
  
 <!-- Copyright (C) 2016 Torbjorn Sjostrand --> 

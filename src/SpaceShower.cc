@@ -257,11 +257,14 @@ void SpaceShower::init( BeamParticle* beamAPtrIn,
   enhanceFactors.clear();
 
   // Enable automated uncertainty variations.
-  nVarQCD              = 0;
-  bool doUncertainties = settingsPtr->flag("UncertaintyBands:doVariations");
-  doUncertaintiesNow   = doUncertainties && initUncertainties();
-  uVarNflavQ           = settingsPtr->mode("UncertaintyBands:nFlavQ");
-  
+  nVarQCD            = 0;
+  doUncertainties    = settingsPtr->flag("UncertaintyBands:doVariations")
+                    && initUncertainties();
+  doUncertaintiesNow = doUncertainties;
+  uVarNflavQ         = settingsPtr->mode("UncertaintyBands:nFlavQ");
+  uVarMPIshowers     = settingsPtr->flag("UncertaintyBands:MPIshowers");
+  cNSpTmin           = settingsPtr->parm("UncertaintyBands:cNSpTmin");
+
 }
 
 //--------------------------------------------------------------------------
@@ -287,8 +290,7 @@ bool SpaceShower::limitPTmax( Event& event, double Q2Fac, double Q2Ren) {
   // Also count number of heavy coloured particles, like top.
   else {
     int n21 = 0;
-    int iBegin = 5;
-    if (infoPtr->isHardDiffractive()) iBegin = 9;
+    int iBegin = 5 + beamOffset;
     for (int i = iBegin; i < event.size(); ++i) {
       if (event[i].status() == -21) ++n21;
       else if (n21 == 0) {
@@ -539,7 +541,7 @@ double SpaceShower::pTnext( Event& event, double pTbegAll, double pTendAll,
     dipEndNow      = &dipEnd[iDipEnd];
     iSysNow        = dipEndNow->system;
     dipEndNow->pT2 = 0.;
-    dipEndNow->storeVars(1.0,"");
+    dipEndNow->pAccept = 1.0;
     double pTbegDip = min( pTbegAll, dipEndNow->pTmax );
 
     // Check whether dipole end should be allowed to shower.
@@ -670,10 +672,11 @@ void SpaceShower::pT2nextQCD( double pT2begDip, double pT2endDip) {
   double pT2PDF         = pT2;
   bool   needNewPDF     = true;
 
-  // Add more headRoom if doing uncertainty variations
+  // Add more headroom if doing uncertainty variations
   // (to ensure at least a minimal number of failed branchings).
-  //  double overFac = (nVarQCD > 0) ? 2.0 : 1.0;
-  double pAccept         = 1.0;
+  doUncertaintiesNow    = doUncertainties;
+  if (!uVarMPIshowers && iSysNow != 0) doUncertaintiesNow = false;
+  double overFac        = doUncertaintiesNow ? 1.5 : 1.0;
 
   // Set default values for enhanced emissions.
   bool isEnhancedQ2QG, isEnhancedG2QQ, isEnhancedQ2GQ, isEnhancedG2GG;
@@ -750,7 +753,7 @@ void SpaceShower::pT2nextQCD( double pT2begDip, double pT2endDip) {
 
       // Integrals of splitting kernels for gluons: g -> g, q -> g.
       if (isGluon) {
-        g2gInt = HEADROOMG2G * 6.
+        g2gInt = overFac * HEADROOMG2G * 6.
           * log(zMaxAbs * (1.-zMinAbs) / (zMinAbs * (1.-zMaxAbs)));
         if (doMEcorrections) g2gInt *= calcMEmax(MEtype, 21, 21);
         // Optionally enhanced branching rate.
@@ -788,12 +791,12 @@ void SpaceShower::pT2nextQCD( double pT2begDip, double pT2endDip) {
 
       // Integrals of splitting kernels for quarks: q -> q, g -> q.
       } else {
-        q2qInt = HEADROOMQ2Q * (8./3.)
+        q2qInt = overFac * HEADROOMQ2Q * (8./3.)
           * log( (1. - zMinAbs) / (1. - zMaxAbs) );
         if (doMEcorrections) q2qInt *= calcMEmax(MEtype, 1, 1);
         // Optionally enhanced branching rate.
         if (canEnhanceET) q2qInt *= userHooksPtr->enhanceFactor("isr:Q2QG");
-        g2qInt = HEADROOMG2Q * 0.5 * (zMaxAbs - zMinAbs);
+        g2qInt = overFac * HEADROOMG2Q * 0.5 * (zMaxAbs - zMinAbs);
         if (doMEcorrections) g2qInt *= calcMEmax(MEtype, 21, 1);
         // Optionally enhanced branching rate.
         if (canEnhanceET) g2qInt *= userHooksPtr->enhanceFactor("isr:G2QQ");
@@ -986,6 +989,9 @@ void SpaceShower::pT2nextQCD( double pT2begDip, double pT2endDip) {
       }
     }
 
+    // Cancel out uncertainty-band extra headroom factors.
+    wt /= overFac;
+
     // Derive Q2 and x of mother from pT2 and z.
     Q2      = pT2 / (1. - z);
     xMother = xDaughter / z;
@@ -1065,8 +1071,8 @@ void SpaceShower::pT2nextQCD( double pT2begDip, double pT2endDip) {
     wt *= xPDFmotherNew / xPDFdaughterNew;
 
     // If doing uncertainty variations, postpone accept/reject to branch()
-    if( wt>0 && pT2 > pT2min && doUncertaintiesNow) {
-      pAccept = wt;
+    if (wt > 0. && pT2 > pT2min && doUncertaintiesNow ) {
+      dipEndNow->pAccept = wt;
       wt      = 1.0;
     }
 
@@ -1089,7 +1095,6 @@ void SpaceShower::pT2nextQCD( double pT2begDip, double pT2endDip) {
   // Save values for (so far) acceptable branching.
   dipEndNow->store( idDaughter,idMother, idSister, x1Now, x2Now, m2Dip,
     pT2, z, xMother, Q2, mSister, m2Sister, pT2corr);
-  dipEndNow->storeVars(pAccept, nameNow);
 
 }
 
@@ -1185,6 +1190,12 @@ void SpaceShower::pT2nearThreshold( BeamParticle& beam,
       double xPDFmotherNew = beam.xfISR(iSysNow, 21, xMother, pdfScale2);
       wt *= xPDFmotherNew / xPDFmotherOld;
 
+    }
+
+    // If doing uncertainty variations, postpone accept/reject to branch().
+    if (wt > 0. && pT2 > pT2min && doUncertaintiesNow ) {
+      dipEndNow->pAccept = wt;
+      wt      = 1.0;
     }
 
   // Iterate until acceptable pT and z.
@@ -2118,6 +2129,13 @@ bool SpaceShower::branch( Event& event) {
   bool canMergeFirst = (mergingHooksPtr != 0)
                      ? mergingHooksPtr->canVetoEmission() : false;
 
+<<<<<<< HEAD
+=======
+  // Check if doing uncertainty variations
+  doUncertaintiesNow = doUncertainties;
+  if (!uVarMPIshowers && iSysSel != 0) doUncertaintiesNow = false;
+
+>>>>>>> svnsynch
   // Save further properties to be restored.
   if (canVetoEmission || canMergeFirst || canEnhanceET || doWeakShower
     || doUncertaintiesNow) {
@@ -2447,6 +2465,7 @@ bool SpaceShower::branch( Event& event) {
     }
   }
 
+<<<<<<< HEAD
   // Recover delayed shower-accept probability for uncertainty variations.
   double pAccept = dipEndSel->pAccept;
 
@@ -2461,6 +2480,24 @@ bool SpaceShower::branch( Event& event) {
   if( !acceptEvent ) {
     // Restore kinematics before returning
     event.popBack( event.size() - eventSizeOld);
+=======
+ // Recover delayed shower-accept probability for uncertainty variations.
+  double pAccept = dipEndSel->pAccept;
+
+  // Decide if we are going to accept or reject this branching.
+  // (Without wasting time generating random numbers if pAccept = 1.)
+  bool acceptEvent = true;
+  if (pAccept < 1.0) acceptEvent = (rndmPtr->flat() < pAccept);
+
+  // If doing uncertainty variations, calculate accept/reject reweightings.
+  if (doUncertaintiesNow) calcUncertainties( acceptEvent, pAccept, pT20,
+    dipEndSel, &mother, &daughter);
+
+  // Return false if we decided to reject this branching.
+  if( !acceptEvent ) {
+    // Restore kinematics before returning
+   event.popBack( event.size() - eventSizeOld);
+>>>>>>> svnsynch
     event[beamOff1].daughter1( ev1Dau1V);
     event[beamOff2].daughter1( ev2Dau1V);
     for ( int iCopy = 0; iCopy < systemSizeOld; ++iCopy) {
@@ -2812,6 +2849,10 @@ bool SpaceShower::initUncertainties() {
 
   // Populate lists of uncertainty variations for SpaceShower, by keyword.
   uVarMuSoftCorr = settingsPtr->flag("UncertaintyBands:muSoftCorr");
+<<<<<<< HEAD
+=======
+  dASmax         = settingsPtr->parm("UncertaintyBands:deltaAlphaSmax");
+>>>>>>> svnsynch
 
   // Reset uncertainty variation maps.
   varG2GGmuRfac.clear();    varG2GGcNS.clear();
@@ -2855,8 +2896,21 @@ bool SpaceShower::initUncertainties() {
 
   // Parse each string in uVars to look for recognised keywords.
   for (int iWeight = 1; iWeight <= int(uVars.size()); ++iWeight) {
+<<<<<<< HEAD
     string uVarString = toLower(uVars[iWeight - 1]);
     if (uVarString == "") continue;
+=======
+    // Convert to lowercase (to be case-insensitive). Also remove "=" signs
+    // and extra spaces, so "key=value", "key = value" mapped to "key value"
+    string uVarString = toLower(uVars[iWeight - 1]);
+    while (uVarString.find("=") != string::npos) {
+      int firstEqual = uVarString.find_first_of("=");
+      uVarString.replace(firstEqual, 1, " ");
+    }
+    while (uVarString.find("  ") != string::npos)
+      uVarString.erase( uVarString.find("  "), 1);
+    if (uVarString == "" || uVarString == " ") continue;
+>>>>>>> svnsynch
 
     // Loop over all keywords.
     int nRecognizedQCD = 0;
@@ -2867,7 +2921,11 @@ bool SpaceShower::initUncertainties() {
       if (uVarString.find(key) == string::npos) continue;
       // Extract variation value/factor.
       int iKey = uVarString.find(key);
+<<<<<<< HEAD
       int iBeg = uVarString.find("=", iKey) + 1;
+=======
+      int iBeg = uVarString.find(" ", iKey) + 1;
+>>>>>>> svnsynch
       int iEnd = uVarString.find(" ", iBeg);
       string valueString = uVarString.substr(iBeg, iEnd - iBeg);
       stringstream ss(valueString);
@@ -2909,14 +2967,25 @@ bool SpaceShower::initUncertainties() {
   return (nVarQCD > 0);
 }
 
+<<<<<<< HEAD
 
 //==========================================================================
+=======
+//--------------------------------------------------------------------------
+>>>>>>> svnsynch
 
 // Calculate uncertainties for the current event.
 
 void SpaceShower::calcUncertainties(bool accept, double pAccept, double pT20in,
   SpaceDipoleEnd* dip, Particle* radPtr, Particle* emtPtr) {
 
+<<<<<<< HEAD
+=======
+  // Sanity check.
+  if (!doUncertainties || !doUncertaintiesNow || nUncertaintyVariations <= 0)
+    return;
+
+>>>>>>> svnsynch
   // Define pointer and iterator to loop over the contents of each
   // (iWeight,value) map.
   map<int,double>* varPtr=0;
@@ -2938,6 +3007,7 @@ void SpaceShower::calcUncertainties(bool accept, double pAccept, double pT20in,
 
     // QCD renormalization-scale variations.
     if (alphaSorder == 0) varPtr = &dummy;
+<<<<<<< HEAD
     else if (idEmt == 21 && idRad == 21) varPtr = &varG2GGmuRfac;
     else if (idEmt == 21 && abs(idRad) <= uVarNflavQ)
       varPtr = &varQ2QGmuRfac;
@@ -2946,6 +3016,14 @@ void SpaceShower::calcUncertainties(bool accept, double pAccept, double pT20in,
     else if (idEmt == 21) varPtr = &varX2XGmuRfac;
     else if (idRad == 21 && abs(idEmt) <= nQuarkIn)
       varPtr = &varG2QQmuRfac;
+=======
+    else if (idRad == 21 && idEmt == 21) varPtr = &varG2GGmuRfac;
+    else if (idRad == 21 && abs(idEmt) <= nQuarkIn) varPtr = &varG2QQmuRfac;
+    else if (abs(idRad) <= nQuarkIn) {
+      if (abs(idRad) <= uVarNflavQ) varPtr = &varQ2QGmuRfac;
+      else varPtr = &varX2XGmuRfac;
+    }
+>>>>>>> svnsynch
     else varPtr = &dummy;
     for (itVar = varPtr->begin(); itVar != varPtr->end(); ++itVar) {
       int iWeight   = itVar->first;
@@ -2970,15 +3048,24 @@ void SpaceShower::calcUncertainties(bool accept, double pAccept, double pT20in,
       }
       // Apply correction factor here for emission processes.
       double alphaSfac   = alphaSratio * facCorr;
+<<<<<<< HEAD
       // Limit absolute variation to +/- 0.2.
       if (alphaSfac > 1.)
         alphaSfac = min(alphaSfac, (alphaSbaseline + 0.2) / alphaSbaseline);
       else if (alphaSbaseline > 0.2)
         alphaSfac = max(alphaSfac, (alphaSbaseline - 0.2) / alphaSbaseline);
+=======
+      // Limit absolute variation to +/- deltaAlphaSmax
+      if (alphaSfac > 1.)
+        alphaSfac = min(alphaSfac, (alphaSbaseline + dASmax) / alphaSbaseline);
+      else if (alphaSbaseline > dASmax)
+        alphaSfac = max(alphaSfac, (alphaSbaseline - dASmax) / alphaSbaseline);
+>>>>>>> svnsynch
       uVarFac[iWeight] *= alphaSfac;
       doVar[iWeight] = true;
     }
 
+<<<<<<< HEAD
     // QCD finite-term variations (only when no MECs).
     if (dip->MEtype != 0) varPtr = &dummy;
     else if (idEmt == 21 && idRad == 21) varPtr = &varG2GGcNS;
@@ -2986,6 +3073,16 @@ void SpaceShower::calcUncertainties(bool accept, double pAccept, double pT20in,
     else if (abs(idRad) <= 8 && abs(idEmt) <= 8) varPtr = &varQ2GQcNS;
     else if (idEmt == 21) varPtr = &varX2XGcNS;
     else if (idRad == 21 && abs(idEmt) <= 8) varPtr = &varG2QQcNS;
+=======
+    // QCD finite-term variations (only when no MECs and above pT threshold).
+    if (dip->MEtype != 0 || dip->pT2 < pow2(cNSpTmin) ) varPtr = &dummy;
+    else if (idRad == 21 && idEmt == 21) varPtr = &varG2GGcNS;
+    else if (idRad == 21 && abs(idEmt) <= nQuarkIn) varPtr = &varG2QQcNS;
+    else if (abs(idRad) <= nQuarkIn) {
+      if (abs(idRad) <= uVarNflavQ) varPtr = &varQ2QGcNS;
+      else varPtr = &varX2XGcNS;
+    }
+>>>>>>> svnsynch
     else varPtr = &dummy;
     for (itVar = varPtr->begin(); itVar != varPtr->end(); ++itVar) {
       int iWeight   = itVar->first;
@@ -2993,8 +3090,16 @@ void SpaceShower::calcUncertainties(bool accept, double pAccept, double pT20in,
       // Correction-factor alphaS.
       double z   = dip->z;
       double Q2  = dip->pT2;
+<<<<<<< HEAD
       // Virtuality for massive radiators.
       if (abs(idRad) >= 4 && idRad != 21) Q2 = max(1., Q2-radPtr->m2());
+=======
+      // Virtuality for off-shell massive quarks.
+      if (idRad == 21 && abs(idEmt) >= 4 && idEmt != 21)
+        Q2 = max(1., Q2+pow2(emtPtr->m0()));
+      else if (idEmt == 21 && abs(idRad) >= 4 && idRad != 21)
+        Q2 = max(1., Q2+pow2(radPtr->m0()));
+>>>>>>> svnsynch
       double yQ  = Q2 / dip->m2Dip;
       double num = yQ * valFac;
       double denom = 1.;
@@ -3003,6 +3108,7 @@ void SpaceShower::calcUncertainties(bool accept, double pAccept, double pT20in,
         denom = pow2(1. - z * (1.-z)) / (z*(1.-z));
       // Q->QG.
       else if (idEmt == 21)
+<<<<<<< HEAD
           denom = (1. + pow2(z)) / (1. - z);
       // Q->GQ.
       else if (idRad == idEmt)
@@ -3010,6 +3116,15 @@ void SpaceShower::calcUncertainties(bool accept, double pAccept, double pT20in,
       // G->QQ.
       else
           denom = pow2(z) + pow2(1. - z);
+=======
+        denom = (1. + pow2(z)) / (1. - z);
+      // Q->GQ.
+      else if (idRad == idEmt)
+        denom = (1. + pow2(1. - z)) / z;
+      // G->QQ.
+      else
+        denom = pow2(z) + pow2(1. - z);
+>>>>>>> svnsynch
       // Compute reweight ratio.
       uVarFac[iWeight] *= 1. + num / denom;
       doVar[iWeight] = true;
