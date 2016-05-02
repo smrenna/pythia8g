@@ -2129,13 +2129,10 @@ bool SpaceShower::branch( Event& event) {
   bool canMergeFirst = (mergingHooksPtr != 0)
                      ? mergingHooksPtr->canVetoEmission() : false;
 
-<<<<<<< HEAD
-=======
   // Check if doing uncertainty variations
   doUncertaintiesNow = doUncertainties;
   if (!uVarMPIshowers && iSysSel != 0) doUncertaintiesNow = false;
 
->>>>>>> svnsynch
   // Save further properties to be restored.
   if (canVetoEmission || canMergeFirst || canEnhanceET || doWeakShower
     || doUncertaintiesNow) {
@@ -2465,22 +2462,6 @@ bool SpaceShower::branch( Event& event) {
     }
   }
 
-<<<<<<< HEAD
-  // Recover delayed shower-accept probability for uncertainty variations.
-  double pAccept = dipEndSel->pAccept;
-
-  // Decide if we are going to accept or reject this branching.
-  bool acceptEvent = (rndmPtr->flat() < pAccept);
-
-  // If doing uncertainty variations, calculate accept/reject reweightings.
-  if (doUncertaintiesNow)
-    calcUncertainties( acceptEvent, pAccept, pT20, dipEndSel, &mother, &daughter);
-
-  // Return false if we decided to reject this branching.
-  if( !acceptEvent ) {
-    // Restore kinematics before returning
-    event.popBack( event.size() - eventSizeOld);
-=======
  // Recover delayed shower-accept probability for uncertainty variations.
   double pAccept = dipEndSel->pAccept;
 
@@ -2496,8 +2477,7 @@ bool SpaceShower::branch( Event& event) {
   // Return false if we decided to reject this branching.
   if( !acceptEvent ) {
     // Restore kinematics before returning
-   event.popBack( event.size() - eventSizeOld);
->>>>>>> svnsynch
+    event.popBack( event.size() - eventSizeOld);
     event[beamOff1].daughter1( ev1Dau1V);
     event[beamOff2].daughter1( ev2Dau1V);
     for ( int iCopy = 0; iCopy < systemSizeOld; ++iCopy) {
@@ -2849,10 +2829,7 @@ bool SpaceShower::initUncertainties() {
 
   // Populate lists of uncertainty variations for SpaceShower, by keyword.
   uVarMuSoftCorr = settingsPtr->flag("UncertaintyBands:muSoftCorr");
-<<<<<<< HEAD
-=======
   dASmax         = settingsPtr->parm("UncertaintyBands:deltaAlphaSmax");
->>>>>>> svnsynch
 
   // Reset uncertainty variation maps.
   varG2GGmuRfac.clear();    varG2GGcNS.clear();
@@ -2896,10 +2873,6 @@ bool SpaceShower::initUncertainties() {
 
   // Parse each string in uVars to look for recognised keywords.
   for (int iWeight = 1; iWeight <= int(uVars.size()); ++iWeight) {
-<<<<<<< HEAD
-    string uVarString = toLower(uVars[iWeight - 1]);
-    if (uVarString == "") continue;
-=======
     // Convert to lowercase (to be case-insensitive). Also remove "=" signs
     // and extra spaces, so "key=value", "key = value" mapped to "key value"
     string uVarString = toLower(uVars[iWeight - 1]);
@@ -2910,7 +2883,6 @@ bool SpaceShower::initUncertainties() {
     while (uVarString.find("  ") != string::npos)
       uVarString.erase( uVarString.find("  "), 1);
     if (uVarString == "" || uVarString == " ") continue;
->>>>>>> svnsynch
 
     // Loop over all keywords.
     int nRecognizedQCD = 0;
@@ -2921,11 +2893,7 @@ bool SpaceShower::initUncertainties() {
       if (uVarString.find(key) == string::npos) continue;
       // Extract variation value/factor.
       int iKey = uVarString.find(key);
-<<<<<<< HEAD
-      int iBeg = uVarString.find("=", iKey) + 1;
-=======
       int iBeg = uVarString.find(" ", iKey) + 1;
->>>>>>> svnsynch
       int iEnd = uVarString.find(" ", iBeg);
       string valueString = uVarString.substr(iBeg, iEnd - iBeg);
       stringstream ss(valueString);
@@ -2967,25 +2935,17 @@ bool SpaceShower::initUncertainties() {
   return (nVarQCD > 0);
 }
 
-<<<<<<< HEAD
-
-//==========================================================================
-=======
 //--------------------------------------------------------------------------
->>>>>>> svnsynch
 
 // Calculate uncertainties for the current event.
 
 void SpaceShower::calcUncertainties(bool accept, double pAccept, double pT20in,
   SpaceDipoleEnd* dip, Particle* radPtr, Particle* emtPtr) {
 
-<<<<<<< HEAD
-=======
   // Sanity check.
   if (!doUncertainties || !doUncertaintiesNow || nUncertaintyVariations <= 0)
     return;
 
->>>>>>> svnsynch
   // Define pointer and iterator to loop over the contents of each
   // (iWeight,value) map.
   map<int,double>* varPtr=0;
@@ -3007,23 +2967,12 @@ void SpaceShower::calcUncertainties(bool accept, double pAccept, double pT20in,
 
     // QCD renormalization-scale variations.
     if (alphaSorder == 0) varPtr = &dummy;
-<<<<<<< HEAD
-    else if (idEmt == 21 && idRad == 21) varPtr = &varG2GGmuRfac;
-    else if (idEmt == 21 && abs(idRad) <= uVarNflavQ)
-      varPtr = &varQ2QGmuRfac;
-    else if (abs(idRad) <= uVarNflavQ)
-      varPtr = &varQ2GQmuRfac;
-    else if (idEmt == 21) varPtr = &varX2XGmuRfac;
-    else if (idRad == 21 && abs(idEmt) <= nQuarkIn)
-      varPtr = &varG2QQmuRfac;
-=======
     else if (idRad == 21 && idEmt == 21) varPtr = &varG2GGmuRfac;
     else if (idRad == 21 && abs(idEmt) <= nQuarkIn) varPtr = &varG2QQmuRfac;
     else if (abs(idRad) <= nQuarkIn) {
       if (abs(idRad) <= uVarNflavQ) varPtr = &varQ2QGmuRfac;
       else varPtr = &varX2XGmuRfac;
     }
->>>>>>> svnsynch
     else varPtr = &dummy;
     for (itVar = varPtr->begin(); itVar != varPtr->end(); ++itVar) {
       int iWeight   = itVar->first;
@@ -3048,32 +2997,15 @@ void SpaceShower::calcUncertainties(bool accept, double pAccept, double pT20in,
       }
       // Apply correction factor here for emission processes.
       double alphaSfac   = alphaSratio * facCorr;
-<<<<<<< HEAD
-      // Limit absolute variation to +/- 0.2.
-      if (alphaSfac > 1.)
-        alphaSfac = min(alphaSfac, (alphaSbaseline + 0.2) / alphaSbaseline);
-      else if (alphaSbaseline > 0.2)
-        alphaSfac = max(alphaSfac, (alphaSbaseline - 0.2) / alphaSbaseline);
-=======
       // Limit absolute variation to +/- deltaAlphaSmax
       if (alphaSfac > 1.)
         alphaSfac = min(alphaSfac, (alphaSbaseline + dASmax) / alphaSbaseline);
       else if (alphaSbaseline > dASmax)
         alphaSfac = max(alphaSfac, (alphaSbaseline - dASmax) / alphaSbaseline);
->>>>>>> svnsynch
       uVarFac[iWeight] *= alphaSfac;
       doVar[iWeight] = true;
     }
 
-<<<<<<< HEAD
-    // QCD finite-term variations (only when no MECs).
-    if (dip->MEtype != 0) varPtr = &dummy;
-    else if (idEmt == 21 && idRad == 21) varPtr = &varG2GGcNS;
-    else if (idEmt == 21 && abs(idRad) <= 8) varPtr = &varQ2QGcNS;
-    else if (abs(idRad) <= 8 && abs(idEmt) <= 8) varPtr = &varQ2GQcNS;
-    else if (idEmt == 21) varPtr = &varX2XGcNS;
-    else if (idRad == 21 && abs(idEmt) <= 8) varPtr = &varG2QQcNS;
-=======
     // QCD finite-term variations (only when no MECs and above pT threshold).
     if (dip->MEtype != 0 || dip->pT2 < pow2(cNSpTmin) ) varPtr = &dummy;
     else if (idRad == 21 && idEmt == 21) varPtr = &varG2GGcNS;
@@ -3082,7 +3014,6 @@ void SpaceShower::calcUncertainties(bool accept, double pAccept, double pT20in,
       if (abs(idRad) <= uVarNflavQ) varPtr = &varQ2QGcNS;
       else varPtr = &varX2XGcNS;
     }
->>>>>>> svnsynch
     else varPtr = &dummy;
     for (itVar = varPtr->begin(); itVar != varPtr->end(); ++itVar) {
       int iWeight   = itVar->first;
@@ -3090,16 +3021,11 @@ void SpaceShower::calcUncertainties(bool accept, double pAccept, double pT20in,
       // Correction-factor alphaS.
       double z   = dip->z;
       double Q2  = dip->pT2;
-<<<<<<< HEAD
-      // Virtuality for massive radiators.
-      if (abs(idRad) >= 4 && idRad != 21) Q2 = max(1., Q2-radPtr->m2());
-=======
       // Virtuality for off-shell massive quarks.
       if (idRad == 21 && abs(idEmt) >= 4 && idEmt != 21)
         Q2 = max(1., Q2+pow2(emtPtr->m0()));
       else if (idEmt == 21 && abs(idRad) >= 4 && idRad != 21)
         Q2 = max(1., Q2+pow2(radPtr->m0()));
->>>>>>> svnsynch
       double yQ  = Q2 / dip->m2Dip;
       double num = yQ * valFac;
       double denom = 1.;
@@ -3108,15 +3034,6 @@ void SpaceShower::calcUncertainties(bool accept, double pAccept, double pT20in,
         denom = pow2(1. - z * (1.-z)) / (z*(1.-z));
       // Q->QG.
       else if (idEmt == 21)
-<<<<<<< HEAD
-          denom = (1. + pow2(z)) / (1. - z);
-      // Q->GQ.
-      else if (idRad == idEmt)
-          denom = (1. + pow2(1. - z)) / z;
-      // G->QQ.
-      else
-          denom = pow2(z) + pow2(1. - z);
-=======
         denom = (1. + pow2(z)) / (1. - z);
       // Q->GQ.
       else if (idRad == idEmt)
@@ -3124,7 +3041,6 @@ void SpaceShower::calcUncertainties(bool accept, double pAccept, double pT20in,
       // G->QQ.
       else
         denom = pow2(z) + pow2(1. - z);
->>>>>>> svnsynch
       // Compute reweight ratio.
       uVarFac[iWeight] *= 1. + num / denom;
       doVar[iWeight] = true;
